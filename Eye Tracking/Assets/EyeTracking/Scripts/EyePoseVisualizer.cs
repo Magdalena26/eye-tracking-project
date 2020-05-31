@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using EyeTracking.Scripts;
+﻿using EyeTracking.Scripts;
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
@@ -18,38 +16,64 @@ using UnityEngine.XR.ARKit;
 [RequireComponent(typeof(ARFace))]
 public class EyePoseVisualizer : MonoBehaviour
 {
-    GameObject m_LeftEyeGameObject;
-    GameObject m_RightEyeGameObject;
-
-    ARFace m_Face;
+    private GameObject _leftEyeGameObject;
+    private GameObject _rightEyeGameObject;
+    private ARFace _face;
     private ObjectSelector _objectSelector;
     private UIObject _currentlySelected;
 
-    void Awake()
+    private void Awake()
     {
-        m_Face = GetComponent<ARFace>();
+        _face = GetComponent<ARFace>();
         _objectSelector = FindObjectOfType<ObjectSelector>();
     }
 
-    void CreateEyeGameObjectsIfNecessary()
+    private void OnEnable()
+    {
+        var faceManager = FindObjectOfType<ARFaceManager>();
+        if (faceManager != null && faceManager.subsystem != null &&
+            faceManager.subsystem.SubsystemDescriptor.supportsEyeTracking)
+        {
+            SetVisible((_face.trackingState == TrackingState.Tracking) && (ARSession.state > ARSessionState.Ready));
+            _face.updated += OnUpdated;
+        }
+        else
+        {
+            enabled = false;
+        }
+    }
+
+    private void OnDisable()
+    {
+        _face.updated -= OnUpdated;
+        SetVisible(false);
+    }
+
+    private void OnUpdated(ARFaceUpdatedEventArgs eventArgs)
+    {
+        CreateEyeGameObjectsIfNecessary();
+        SetVisible((_face.trackingState == TrackingState.Tracking) && (ARSession.state > ARSessionState.Ready));
+    }
+
+    private void CreateEyeGameObjectsIfNecessary()
     {
         if (_objectSelector.GetSelectedObject() != null)
         {
             DestroyPreviouslySelectedObjects();
-            
+
             _currentlySelected = _objectSelector.GetSelectedObject();
 
             var eyeObject = _currentlySelected.ObjectToSpawn();
-            if (m_Face.leftEye != null && m_LeftEyeGameObject == null)
+            if (_face.leftEye != null && _leftEyeGameObject == null)
             {
-                m_LeftEyeGameObject = Instantiate(eyeObject, m_Face.leftEye);
-                m_LeftEyeGameObject.SetActive(false);
+                _leftEyeGameObject = Instantiate(eyeObject, _face.leftEye);
+                _leftEyeGameObject.SetActive(false);
             }
 
-            if (m_Face.rightEye != null && m_RightEyeGameObject == null && _objectSelector.GetSelectedObject() != null)
+            if (_face.rightEye != null && _rightEyeGameObject == null && _objectSelector.GetSelectedObject() != null)
             {
-                m_RightEyeGameObject = Instantiate(eyeObject, m_Face.rightEye);
-                m_RightEyeGameObject.SetActive(false);
+                _rightEyeGameObject = Instantiate(eyeObject, _face.rightEye);
+                _rightEyeGameObject.SetActive(false);
             }
         }
     }
@@ -58,53 +82,26 @@ public class EyePoseVisualizer : MonoBehaviour
     {
         if (_currentlySelected != null && _currentlySelected.Name == _objectSelector.GetSelectedObject().Name)
         {
-            if (m_LeftEyeGameObject != null)
+            if (_leftEyeGameObject != null)
             {
-                Destroy(m_LeftEyeGameObject);
-                m_LeftEyeGameObject = null;
+                Destroy(_leftEyeGameObject);
+                _leftEyeGameObject = null;
             }
 
-            if (m_RightEyeGameObject != null)
+            if (_rightEyeGameObject != null)
             {
-                Destroy(m_RightEyeGameObject);
-                m_RightEyeGameObject = null;
+                Destroy(_rightEyeGameObject);
+                _rightEyeGameObject = null;
             }
         }
     }
 
-    void SetVisible(bool visible)
+    private void SetVisible(bool visible)
     {
-        if (m_LeftEyeGameObject != null && m_RightEyeGameObject != null)
+        if (_leftEyeGameObject != null && _rightEyeGameObject != null)
         {
-            m_LeftEyeGameObject.SetActive(visible);
-            m_RightEyeGameObject.SetActive(visible);
+            _leftEyeGameObject.SetActive(visible);
+            _rightEyeGameObject.SetActive(visible);
         }
-    }
-
-    void OnEnable()
-    {
-        var faceManager = FindObjectOfType<ARFaceManager>();
-        if (faceManager != null && faceManager.subsystem != null &&
-            faceManager.subsystem.SubsystemDescriptor.supportsEyeTracking)
-        {
-            SetVisible((m_Face.trackingState == TrackingState.Tracking) && (ARSession.state > ARSessionState.Ready));
-            m_Face.updated += OnUpdated;
-        }
-        else
-        {
-            enabled = false;
-        }
-    }
-
-    void OnDisable()
-    {
-        m_Face.updated -= OnUpdated;
-        SetVisible(false);
-    }
-
-    void OnUpdated(ARFaceUpdatedEventArgs eventArgs)
-    {
-        CreateEyeGameObjectsIfNecessary();
-        SetVisible((m_Face.trackingState == TrackingState.Tracking) && (ARSession.state > ARSessionState.Ready));
     }
 }
