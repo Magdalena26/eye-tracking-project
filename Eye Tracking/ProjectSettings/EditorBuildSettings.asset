@@ -9,7 +9,7 @@ EditorBuildSettings:
     path: Assets/EyeTracking/Scenes/EyeTracking.unity
     guid: c8ca2b95503fe4a7194f37bfbe5e4688
   m_configObjects:
-    com.unity.xr.arkit.PlayerSettings: {fileID: 11400000, guid: aa8c09e2a4f234350a3af19941b1ddbd,
+    com.unity.xr.arkit.PlayerSettings: {fileID: 11400000, guid: 2d5fb8e61571b4e3897f221189089fd6,
       type: 2}
-    com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 6c65a5684364340ffb924a3cc626306f,
+    com.unity.xr.management.loader_settings: {fileID: 11400000, guid: e2f869774b12e400996eb546603602e3,
       type: 2}

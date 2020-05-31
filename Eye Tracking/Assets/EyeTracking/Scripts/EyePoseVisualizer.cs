@@ -22,7 +22,6 @@ public class EyePoseVisualizer : MonoBehaviour
     GameObject m_RightEyeGameObject;
 
     ARFace m_Face;
-    XRFaceSubsystem m_FaceSubsystem;
     private ObjectSelector _objectSelector;
     private UIObject _currentlySelected;
 
@@ -37,8 +36,10 @@ public class EyePoseVisualizer : MonoBehaviour
         if (_objectSelector.GetSelectedObject() != null)
         {
             DestroyPreviouslySelectedObjects();
+            
+            _currentlySelected = _objectSelector.GetSelectedObject();
 
-            var eyeObject = _objectSelector.GetSelectedObject().ObjectToSpawn();
+            var eyeObject = _currentlySelected.ObjectToSpawn();
             if (m_Face.leftEye != null && m_LeftEyeGameObject == null)
             {
                 m_LeftEyeGameObject = Instantiate(eyeObject, m_Face.leftEye);
@@ -86,7 +87,6 @@ public class EyePoseVisualizer : MonoBehaviour
         if (faceManager != null && faceManager.subsystem != null &&
             faceManager.subsystem.SubsystemDescriptor.supportsEyeTracking)
         {
-            m_FaceSubsystem = (XRFaceSubsystem) faceManager.subsystem;
             SetVisible((m_Face.trackingState == TrackingState.Tracking) && (ARSession.state > ARSessionState.Ready));
             m_Face.updated += OnUpdated;
         }
