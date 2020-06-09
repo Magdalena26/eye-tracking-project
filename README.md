@@ -17,3 +17,5 @@ The application is designed to work on Apple smartfones and tablets, whose camer
 - iPhone 11/11 Pro
 - iPad Pro
 
+## Application sample sceenshots
+<img src="/imgs/ex1.PNG" width="200"> <img src="/imgs/ex2.PNG" width="200"> <img src="/imgs/ex3.PNG" width="200">
